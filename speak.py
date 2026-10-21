@@ -5,6 +5,8 @@ import torch
 import soundfile as sf
 import pygame
 
+from text_prep import prepare
+
 device = torch.device("cpu")
 model, _ = torch.hub.load(
     repo_or_dir="snakers4/silero-models",
@@ -14,7 +16,7 @@ model, _ = torch.hub.load(
 )
 model.to(device)
 
-SPEAKER = "baya"  # мужской; ещё: eugene, baya, kseniya, xenia aidar
+SPEAKER = "aidar"  # мужской; ещё: eugene, baya, kseniya, xenia
 SAMPLE_RATE = 48000
 
 pygame.mixer.init()
@@ -23,7 +25,10 @@ path = os.path.join(tempfile.gettempdir(), "jarvis_tts.wav")
 
 def say(text):
     print("Джарвис:", text)
-    audio = model.apply_tts(text=text, speaker=SPEAKER, sample_rate=SAMPLE_RATE)
+    spoken = prepare(text)  # цифры и латиница -> русские слова (Silero их не читает)
+    if not spoken:
+        return
+    audio = model.apply_tts(text=spoken, speaker=SPEAKER, sample_rate=SAMPLE_RATE)
     sf.write(path, audio.numpy(), SAMPLE_RATE)
     pygame.mixer.music.load(path)
     pygame.mixer.music.play()

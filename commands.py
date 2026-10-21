@@ -33,7 +33,8 @@ SITES = {
 
 STOP_WORDS = ["джарвис", "открой", "запусти", "найди", "пожалуйста",
               "новую", "вкладку", "в браузере", "сайт",
-              "приложение", "программу", "программа"]
+              "приложение", "программу", "программа",
+              "закрой", "закрыть", "заверши", "убей", "принудительно"]
 
 
 def find_url(query):
@@ -90,6 +91,17 @@ def handle(cmd):
             say("А что записать?")
         return True
 
+    if any(w in cmd for w in ("закрой", "закрыть", "заверши", "убей")):
+        force = any(w in cmd for w in ("принудительно", "заверши", "убей"))
+        query = clean_query(cmd)
+        if not query:
+            say("Что закрыть?")
+        elif apps_tool.close_app(query, force):
+            say(f"Закрываю {query}")
+        else:
+            say(f"Не нашёл открытое окно {query}")
+        return True
+
     if "новый блокнот" in cmd or "новую заметку" in cmd:
         notepad.open_new_notepad()
         say("Открываю новый блокнот")
@@ -113,13 +125,18 @@ def handle(cmd):
 
         query = clean_query(cmd)
 
-        # любое установленное приложение (кроме команды «найди»: она идёт в интернет)
-        if query and "найди" not in cmd:
+        # «открой / запусти» ищет только приложения и игры; в интернет уходит только «найди»
+        if "найди" not in cmd:
+            if not query:
+                say("Что открыть?")
+                return True
             app = apps_tool.find_app(query)
             if app:
                 apps_tool.launch(app)
                 say(f"Запускаю {app['name']}")
-                return True
+            else:
+                say(f"Не нашёл приложение {query}")
+            return True
 
         if query:
             say(f"Ищу {query}")
