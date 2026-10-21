@@ -7,6 +7,9 @@ from ddgs import DDGS
 
 from speak import say
 import notepad_tool as notepad
+import apps_tool
+
+apps_tool.warm_up()  # список приложений грузится в фоне
 
 
 APPS = {
@@ -29,7 +32,8 @@ SITES = {
 }
 
 STOP_WORDS = ["джарвис", "открой", "запусти", "найди", "пожалуйста",
-              "новую", "вкладку", "в браузере", "сайт"]
+              "новую", "вкладку", "в браузере", "сайт",
+              "приложение", "программу", "программа"]
 
 
 def find_url(query):
@@ -61,6 +65,12 @@ def handle(cmd):
     """Возвращает True, если команда выполнена."""
     if "время" in cmd:
         say(datetime.datetime.now().strftime("Сейчас %H:%M"))
+        return True
+
+    if "обнови" in cmd and "приложен" in cmd:
+        say("Обновляю список приложений")
+        apps_tool.rescan()
+        say("Готово")
         return True
 
     if "сохрани" in cmd:
@@ -102,6 +112,15 @@ def handle(cmd):
                 return True
 
         query = clean_query(cmd)
+
+        # любое установленное приложение (кроме команды «найди»: она идёт в интернет)
+        if query and "найди" not in cmd:
+            app = apps_tool.find_app(query)
+            if app:
+                apps_tool.launch(app)
+                say(f"Запускаю {app['name']}")
+                return True
+
         if query:
             say(f"Ищу {query}")
             url = find_url(query)

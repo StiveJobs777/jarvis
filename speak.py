@@ -14,7 +14,7 @@ model, _ = torch.hub.load(
 )
 model.to(device)
 
-SPEAKER = "aidar"  # мужской; ещё: eugene, baya, kseniya, xenia
+SPEAKER = "baya"  # мужской; ещё: eugene, baya, kseniya, xenia aidar
 SAMPLE_RATE = 48000
 
 pygame.mixer.init()
