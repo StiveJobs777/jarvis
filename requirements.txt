@@ -1,0 +1,19 @@
+# Распознавание речи
+SpeechRecognition
+pyaudio
+faster-whisper
+
+# Озвучка (Silero TTS)
+torch
+omegaconf
+soundfile
+pygame
+
+# Нейросеть (Groq)
+groq
+
+# Команды: поиск в интернете, Блокнот
+ddgs
+pygetwindow
+pyautogui
+pyperclip
